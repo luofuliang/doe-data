@@ -51,7 +51,6 @@ public class DorisQueryDaoImpl implements DorisQueryDao {
         if (guidAndCount.size() > 0) {
             jedis.hmset(ruleId + ":" + conditionId, guidAndCount);
         }
-
     }
 
     @Override
@@ -100,9 +99,7 @@ public class DorisQueryDaoImpl implements DorisQueryDao {
                 // 往redis插入该用户的序列条件的已完成次数
                 jedis.hset(redisSeqCntKey, guid + "", matchCount + "");
             }
-
         }
-
     }
 
     // 测试本类
@@ -121,5 +118,4 @@ public class DorisQueryDaoImpl implements DorisQueryDao {
                 "GROUP BY guid", "rule01", "1", RoaringBitmap.bitmapOf(1, 3, 5, 6));
 
     }
-
 }

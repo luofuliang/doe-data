@@ -147,9 +147,8 @@ public class Test_Rulemodel_02_calculatorTemplate {
                 "}";
 
 
-
-
-        Template template = Engine.use().getTemplate("D:\\IdeaProjects\\doe-data\\rule_model_resources\\templates\\rule_calculator\\rulemodel_02_caculator.enjoy");
+        Template template = Engine.use().getTemplate("D:\\IdeaProjects\\doe-data\\rule_model_resources\\templates" +
+                "\\rule_calculator\\rulemodel_02_caculator.enjoy");
 
         HashMap<String, Object> data = new HashMap<>();
 
@@ -163,8 +162,8 @@ public class Test_Rulemodel_02_calculatorTemplate {
         String cntConditionCombineExpr = actionCountCondition.getString("combineExpr");
 
         data.put("eventParams", new int[eventPamramsSize]);
-        data.put("cntConditionCombineExpr",cntConditionCombineExpr);
-        data.put("ruleCombineExpr",ruleDefineJsonObject.getString("combineExpr"));
+        data.put("cntConditionCombineExpr", cntConditionCombineExpr);
+        data.put("ruleCombineExpr", ruleDefineJsonObject.getString("combineExpr"));
 
         // 渲染groovy代码
         String code = template.renderToString(data);
@@ -177,7 +176,7 @@ public class Test_Rulemodel_02_calculatorTemplate {
         Class aClass = new GroovyClassLoader().parseClass(code);
         RuleCalculator caculator = (RuleCalculator) aClass.newInstance();
         // 先初始化
-        caculator.init(ruleDefineJsonObject, RoaringBitmap.bitmapOf(1,2,3,4,5));
+        caculator.init(ruleDefineJsonObject, RoaringBitmap.bitmapOf(1, 2, 3, 4, 5));
 
         /**
          * 行为次数条件，测试规则参数：
@@ -194,27 +193,25 @@ public class Test_Rulemodel_02_calculatorTemplate {
          */
         // 造一个用户事件
         HashMap<String, String> properties = new HashMap<>();
-        properties.put("pageId","page001");
-        properties.put("p2","v3");
+        properties.put("pageId", "page001");
+        properties.put("p2", "v3");
         UserEvent e1 = new UserEvent(1, "e1", properties, 1661046973000L);
 
         HashMap<String, String> properties3 = new HashMap<>();
-        properties3.put("pageId","page001");
-        properties3.put("itemId","item003");
+        properties3.put("pageId", "page001");
+        properties3.put("itemId", "item003");
         UserEvent e3 = new UserEvent(1, "e3", properties3, 1661046973000L);
 
 
         HashMap<String, String> properties2 = new HashMap<>();
-        properties2.put("pageId","page002");
-        properties2.put("p2","v3");
+        properties2.put("pageId", "page002");
+        properties2.put("p2", "v3");
         UserEvent e2 = new UserEvent(1, "e2", properties2, 1661046973000L);
 
 
         caculator.process(e1);
         caculator.process(e3);
         caculator.process(e2);
-
-
 
 
         // 调用运算机进行运算
@@ -235,8 +232,6 @@ public class Test_Rulemodel_02_calculatorTemplate {
 
         // 然后做匹配判断
         System.out.println(caculator.isMatch(1));
-
-
 
 
     }

@@ -82,7 +82,6 @@ public class RuleSystemMetaDaoImpl implements RuleSystemMetaDao {
         preparedStatement.setTimestamp(8,create_time);
         preparedStatement.setTimestamp(9,update_time);
 
-
         boolean execute = preparedStatement.execute();
         return execute;
     }

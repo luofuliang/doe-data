@@ -14,5 +14,4 @@ public class EventParam {
      private String eventId;
      private List<AttributeParam> attributeParams;
 
-
 }

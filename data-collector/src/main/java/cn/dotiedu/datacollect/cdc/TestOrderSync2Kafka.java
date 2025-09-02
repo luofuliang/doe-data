@@ -34,7 +34,6 @@ public class TestOrderSync2Kafka {
 
     public static void main(String[] args) {
 
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.enableCheckpointing(2000, CheckpointingMode.EXACTLY_ONCE);
         env.getCheckpointConfig().setCheckpointStorage("file:/d:/checkpoint");
@@ -109,8 +108,5 @@ public class TestOrderSync2Kafka {
                 "select id,memeber_id,pay_type,order_amount,pay_amount,order_status, create_time, modify_time,  unix_timestamp(cast(modify_time as string))*1000, tbname, id " +
                 "from flink_order");
 
-
     }
-
-
 }

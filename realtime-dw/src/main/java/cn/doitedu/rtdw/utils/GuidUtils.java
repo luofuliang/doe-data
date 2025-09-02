@@ -49,7 +49,7 @@ public class GuidUtils {
         byte[] value = result.getValue(Bytes.toBytes("f"), Bytes.toBytes("q"));
         if (value != null) {
             return JSON.parseArray(new String(value));
-        }else{
+        } else {
             return null;
         }
     }
@@ -63,17 +63,18 @@ public class GuidUtils {
      * @param table
      * @throws IOException
      */
-    public static void deviceAccountBindWeightHandle(String toIncAccount, String deviceId, Table table ,long userId ,long registerTime) throws IOException {
+    public static void deviceAccountBindWeightHandle(String toIncAccount, String deviceId, Table table, long userId,
+                                                     long registerTime) throws IOException {
 
         // 先从hbase中找到目标设备的所有绑定账号权重信息
         JSONArray bindWeights = getDeviceAccountBindInfo(table, deviceId);
-        if(bindWeights == null ){
+        if (bindWeights == null) {
             // [{"account":"zs","weight":100,"user_id":120,"register_time":17632487346}]
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("account",toIncAccount);
-            jsonObject.put("weight",100);
-            jsonObject.put("user_id",userId);
-            jsonObject.put("register_time",registerTime);
+            jsonObject.put("account", toIncAccount);
+            jsonObject.put("weight", 100);
+            jsonObject.put("user_id", userId);
+            jsonObject.put("register_time", registerTime);
 
             JSONArray objects = new JSONArray();
             objects.add(jsonObject);
@@ -84,7 +85,7 @@ public class GuidUtils {
             put.addColumn(Bytes.toBytes("f"), Bytes.toBytes("q"), Bytes.toBytes(objects.toJSONString()));
             table.put(put);
 
-        }else {
+        } else {
 
             // 遍历从hbase中取到的所有绑定关系数据
             int size = bindWeights.size();
@@ -149,7 +150,8 @@ public class GuidUtils {
         lst.sort(new Comparator<DeviceAccountBindInfo>() {
             @Override
             public int compare(DeviceAccountBindInfo o1, DeviceAccountBindInfo o2) {
-                return o2.getWeight().compareTo(o1.getWeight()) == 0 ? o2.getRegisterTime().compareTo(o1.getRegisterTime()) : o2.getWeight().compareTo(o1.getWeight());
+                return o2.getWeight().compareTo(o1.getWeight()) == 0 ?
+                        o2.getRegisterTime().compareTo(o1.getRegisterTime()) : o2.getWeight().compareTo(o1.getWeight());
             }
         });
 

@@ -32,16 +32,15 @@ object PageContributeUtil {
 
     // 打印每个节点的总贡献量
     val lst1 = ListBuffer.empty[(String, Int)]
-    calcWholeContributePv(node,lst1)
+    calcWholeContributePv(node, lst1)
     println(lst1)
 
     println("------------------------")
 
     // 打印每个节点的总贡献量
     val lst2 = ListBuffer.empty[(String, Int)]
-    calcDirectContributePv(node,lst2)
+    calcDirectContributePv(node, lst2)
     println(lst2)
-
 
 
   }
@@ -69,7 +68,7 @@ object PageContributeUtil {
 
 
   // 计算一棵树上每个节点（页面）的总贡献量
-  def calcWholeContributePv(node:TreeNode, lst:ListBuffer[(String,Int)]):Int = {
+  def calcWholeContributePv(node: TreeNode, lst: ListBuffer[(String, Int)]): Int = {
 
     var contributePv = 0
 
@@ -85,14 +84,14 @@ object PageContributeUtil {
     }
 
     // 把本节点算出来的总贡献量，放入结果list中去
-    lst += ((node.pageId,contributePv))
+    lst += ((node.pageId, contributePv))
 
     contributePv
   }
 
 
   // 计算一棵树上每个节点（页面）的直接贡献量
-  def calcDirectContributePv(node:TreeNode, lst:ListBuffer[(String,Int)]):Unit = {
+  def calcDirectContributePv(node: TreeNode, lst: ListBuffer[(String, Int)]): Unit = {
 
     // 本节点的直接贡献量  =  本节点子节点个数
     // 先加上子节点个数
@@ -104,11 +103,8 @@ object PageContributeUtil {
     }
 
     // 把本节点算出来的总贡献量，放入结果list中去
-    lst += ((node.pageId,node.children.size))
+    lst += ((node.pageId, node.children.size))
   }
-
-
-
 
 
 }

@@ -25,7 +25,8 @@ public class ProfileInjectTest {
         DataStream<Event> eventDataStream = Utils.getEventDataStream(ds);
 
         DataStream<RoaringBitmap> kafkaBitmapStream = Utils.getKafkaBitmap(env);
-        MapStateDescriptor<String, RoaringBitmap> broadcastStateDesc = new MapStateDescriptor<>("broadcastStateDesc", TypeInformation.of(String.class), TypeInformation.of(RoaringBitmap.class));
+        MapStateDescriptor<String, RoaringBitmap> broadcastStateDesc = new MapStateDescriptor<>("broadcastStateDesc",
+                TypeInformation.of(String.class), TypeInformation.of(RoaringBitmap.class));
         BroadcastStream<RoaringBitmap> broadcastStream = kafkaBitmapStream.broadcast(broadcastStateDesc);
 
         eventDataStream
@@ -33,24 +34,27 @@ public class ProfileInjectTest {
                 .connect(broadcastStream)
                 .process(new KeyedBroadcastProcessFunction<Integer, Event, RoaringBitmap, String>() {
                     @Override
-                    public void processElement(Event value, KeyedBroadcastProcessFunction<Integer, Event, RoaringBitmap, String>.ReadOnlyContext ctx, Collector<String> out) throws Exception {
+                    public void processElement(Event value, KeyedBroadcastProcessFunction<Integer, Event,
+                            RoaringBitmap, String>.ReadOnlyContext ctx, Collector<String> out) throws Exception {
                         // 从广播状态取到人群bitmap
                         RoaringBitmap bitmap = ctx.getBroadcastState(broadcastStateDesc).get("rule-1");
 
-                        if(bitmap != null && bitmap.contains(value.getUserId())){
-                            out.collect("用户: "+value.getUserId()+" 存在于画像人群中");
-                        }else if( bitmap == null){
+                        if (bitmap != null && bitmap.contains(value.getUserId())) {
+                            out.collect("用户: " + value.getUserId() + " 存在于画像人群中");
+                        } else if (bitmap == null) {
                             out.collect("bitmap为null");
-                        }else {
-                            out.collect("用户: "+value.getUserId()+ " 不存在");
+                        } else {
+                            out.collect("用户: " + value.getUserId() + " 不存在");
                         }
                     }
 
                     @Override
-                    public void processBroadcastElement(RoaringBitmap bitmap, KeyedBroadcastProcessFunction<Integer, Event, RoaringBitmap, String>.Context ctx, Collector<String> out) throws Exception {
+                    public void processBroadcastElement(RoaringBitmap bitmap, KeyedBroadcastProcessFunction<Integer,
+                            Event, RoaringBitmap, String>.Context ctx, Collector<String> out) throws Exception {
                         log.error("收到广播变量");
-                        BroadcastState<String, RoaringBitmap> broadcastState = ctx.getBroadcastState(broadcastStateDesc);
-                        broadcastState.put("rule-1",bitmap);
+                        BroadcastState<String, RoaringBitmap> broadcastState =
+                                ctx.getBroadcastState(broadcastStateDesc);
+                        broadcastState.put("rule-1", bitmap);
                     }
                 })
                 .print();

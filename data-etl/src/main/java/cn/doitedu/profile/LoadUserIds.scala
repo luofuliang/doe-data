@@ -28,21 +28,20 @@ object LoadUserIds {
       val minute = StringUtils.leftPad(RandomUtils.nextInt(1, 60) + "", 2, "0")
       val second = StringUtils.leftPad(RandomUtils.nextInt(1, 60) + "", 2, "0")
 
-      (account,s"2022-08-${day} ${hour}:${minute}:${second}")
-    }).toDF("account","register_time")
+      (account, s"2022-08-${day} ${hour}:${minute}:${second}")
+    }).toDF("account", "register_time")
 
     df.distinct().createTempView("tv")
 
     val res = spark.sql("select  row_number() over(order by account) as id,account,register_time from tv ")
 
     val props = new Properties()
-    props.setProperty("user","root")
-    props.setProperty("password","root")
-    res.write.mode(SaveMode.Append).jdbc("jdbc:mysql://doitedu:3306/rtmk","ums_member",props)
+    props.setProperty("user", "root")
+    props.setProperty("password", "root")
+    res.write.mode(SaveMode.Append).jdbc("jdbc:mysql://doitedu:3306/rtmk", "ums_member", props)
 
 
     spark.close()
-
 
 
   }

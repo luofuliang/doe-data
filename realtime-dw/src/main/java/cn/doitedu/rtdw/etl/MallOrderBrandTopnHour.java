@@ -24,7 +24,7 @@ public class MallOrderBrandTopnHour {
 
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
         Configuration conf = new Configuration();
-        conf.setInteger("table.exec.resource.default-parallelism",1);
+        conf.setInteger("table.exec.resource.default-parallelism", 1);
         tEnv.getConfig().addConfiguration(conf);
 
 
@@ -33,13 +33,13 @@ public class MallOrderBrandTopnHour {
          */
         tEnv.executeSql(
                 "CREATE TABLE kafka_oms_order_wide_source (  " +
-                        "    oid  INT,                            "+
-                        "    pid  INT,                            "+
-                        "    price FLOAT,                         "+
-                        "    quantity  INT,                       "+
-                        "    create_time timestamp(3),            "+
-                        "    brand  STRING      ,                 "+
-                        "    WATERMARK FOR create_time AS   create_time - INTERVAL '0' SECOND   "+
+                        "    oid  INT,                            " +
+                        "    pid  INT,                            " +
+                        "    price FLOAT,                         " +
+                        "    quantity  INT,                       " +
+                        "    create_time timestamp(3),            " +
+                        "    brand  STRING      ,                 " +
+                        "    WATERMARK FOR create_time AS   create_time - INTERVAL '0' SECOND   " +
                         ") WITH (                                         " +
                         "  'connector' = 'kafka',                         " +
                         "  'topic' = 'dws-oms-order-wide',                " +
@@ -56,34 +56,36 @@ public class MallOrderBrandTopnHour {
          * mysql结果报表的jdbc连接器表
          */
         tEnv.executeSql(
-                " CREATE TABLE brand_order_topn_hour (                                "+
-                        "   window_start timestamp,                                           "+
-                        "   window_end timestamp,                                             "+
-                        "   `rank` int,                                                       "+
-                        "   brand STRING,                                                     "+
-                        "   amt FLOAT,                                                        "+
-                        "   PRIMARY KEY (window_start,window_end,brand,`rank`) NOT ENFORCED   "+
-                        " ) WITH (                                                            "+
-                        "    'connector' = 'jdbc',                                            "+
-                        "    'url' = 'jdbc:mysql://doitedu:3306/rtmk',                        "+
-                        "    'table-name' = 'brand_order_topn_hour',                          "+
-                        "    'username' = 'root',                                             "+
-                        "    'password' = 'root'                                              "+
+                " CREATE TABLE brand_order_topn_hour (                                " +
+                        "   window_start timestamp,                                           " +
+                        "   window_end timestamp,                                             " +
+                        "   `rank` int,                                                       " +
+                        "   brand STRING,                                                     " +
+                        "   amt FLOAT,                                                        " +
+                        "   PRIMARY KEY (window_start,window_end,brand,`rank`) NOT ENFORCED   " +
+                        " ) WITH (                                                            " +
+                        "    'connector' = 'jdbc',                                            " +
+                        "    'url' = 'jdbc:mysql://doitedu:3306/rtmk',                        " +
+                        "    'table-name' = 'brand_order_topn_hour',                          " +
+                        "    'username' = 'root',                                             " +
+                        "    'password' = 'root'                                              " +
                         " )                                                                   "
         );
-
 
 
         /**
          * 对维度打款后的订单数据，进行报表统计： 每小时的订单额最大的前10个品牌及其总交易额
          */
-        tEnv.executeSql("create temporary view ov as select * from kafka_oms_order_wide_source where brand is not null");
+        tEnv.executeSql("create temporary view ov as select * from kafka_oms_order_wide_source where brand is not " +
+                "null");
 
 
         tEnv.executeSql(
                 " INSERT INTO  brand_order_topn_hour                                                   " +
-                " SELECT                                                                                        " +
-                        "    window_start,window_end,cast(rn as int),brand,amt                                                  " +
+                        " SELECT                                                                                     " +
+                        "   " +
+                        "    window_start,window_end,cast(rn as int),brand,amt                                       " +
+                        "           " +
                         " FROM                                                                                  " +
                         " (                                                                                     " +
                         "     SELECT                                                                            " +
@@ -104,7 +106,6 @@ public class MallOrderBrandTopnHour {
                         " )                                                                                     " +
                         " WHERE rn<=2                                                                           "
         )/*.print()*/;
-
 
 
     }

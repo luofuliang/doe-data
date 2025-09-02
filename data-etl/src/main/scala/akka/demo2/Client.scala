@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorSelection, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 
 
-class ClientActor(host:String,port:Int) extends Actor{
+class ClientActor(host: String, port: Int) extends Actor {
 
   var serverActorRef: ActorSelection = _ // 服务端的代理对象
 
@@ -16,7 +16,7 @@ class ClientActor(host:String,port:Int) extends Actor{
   override def receive: Receive = {
     case "start" =>
       serverActorRef ! Message("握手")
-    case Message(msg:String)=>
+    case Message(msg: String) =>
       println(s"客户端收到$msg")
       serverActorRef ! Message("你好")
     case _ =>
@@ -34,7 +34,7 @@ object Client {
 
     //指定客户端的IP和端口
     val host = "127.0.0.1"
-    val port  = 8089
+    val port = 8089
 
     //指定服务端的IP和端口
     val serverHost = "127.0.0.1"

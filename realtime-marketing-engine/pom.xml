@@ -78,7 +78,6 @@
             <version>${flink.version}</version>
         </dependency>
 
-
         <!-- flink-cdc-mysql 连接器-->
         <!--<dependency>
             <groupId>com.ververica</groupId>

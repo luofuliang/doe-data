@@ -46,7 +46,7 @@ public class BitmapSchema implements DeserializationSchema<RoaringBitmap>, Seria
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
-        byte[] bytes ;
+        byte[] bytes;
         try {
             bm.serialize(dos);
             bytes = bos.toByteArray();

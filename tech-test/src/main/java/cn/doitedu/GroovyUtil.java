@@ -15,8 +15,9 @@ public class GroovyUtil {
         try {
             GroovyClassLoader classLoader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader());
             Class clazz = classLoader.parseClass(new GroovyCodeSource(file));
-            groovyObject = (GroovyObject)clazz.newInstance();
-        } catch (Exception e) {}
+            groovyObject = (GroovyObject) clazz.newInstance();
+        } catch (Exception e) {
+        }
         return groovyObject;
     }
 
@@ -26,8 +27,9 @@ public class GroovyUtil {
         try {
             GroovyClassLoader classLoader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader());
             Class clazz = classLoader.parseClass(text);
-            groovyObject = (GroovyObject)clazz.newInstance();
-        } catch (Exception e) {}
+            groovyObject = (GroovyObject) clazz.newInstance();
+        } catch (Exception e) {
+        }
         return groovyObject;
     }
 

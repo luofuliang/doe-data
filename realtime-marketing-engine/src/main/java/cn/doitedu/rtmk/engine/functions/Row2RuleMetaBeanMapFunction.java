@@ -15,18 +15,15 @@ import java.nio.ByteBuffer;
  * @Site: <a href="www.51doit.com">多易教育</a>
  * @QQ: 657270652
  * @Date: 2022/8/20
- * @Desc:
- *
- *   `id` int(11) NOT NULL AUTO_INCREMENT,
- *   `rule_id` varchar(50) DEFAULT NULL,
- *   `rule_model_id` int(11) DEFAULT NULL,
- *   `rule_profile_user_bitmap` binary(255) DEFAULT NULL,
- *   `caculator_groovy_code` text,
- *   `creator_name` varchar(255) DEFAULT NULL,
- *   `rule_status` int(11) DEFAULT NULL,
- *   `create_time` datetime DEFAULT NULL,
- *   `update_time` datetime DEFAULT NULL,
- *
+ * @Desc: `id` int(11) NOT NULL AUTO_INCREMENT,
+ * `rule_id` varchar(50) DEFAULT NULL,
+ * `rule_model_id` int(11) DEFAULT NULL,
+ * `rule_profile_user_bitmap` binary(255) DEFAULT NULL,
+ * `caculator_groovy_code` text,
+ * `creator_name` varchar(255) DEFAULT NULL,
+ * `rule_status` int(11) DEFAULT NULL,
+ * `create_time` datetime DEFAULT NULL,
+ * `update_time` datetime DEFAULT NULL,
  **/
 public class Row2RuleMetaBeanMapFunction implements MapFunction<Row, RuleMetaBean> {
     @Override
@@ -34,20 +31,20 @@ public class Row2RuleMetaBeanMapFunction implements MapFunction<Row, RuleMetaBea
 
         RuleMetaBean ruleMetaBean = new RuleMetaBean();
 
-        if(row.getKind() == RowKind.DELETE){
+        if (row.getKind() == RowKind.DELETE) {
             ruleMetaBean.setOperateType("DELETE");
 
             String ruleId = row.getFieldAs("rule_id");
             ruleMetaBean.setRuleId(ruleId);
 
-        }else if(row.getKind() == RowKind.UPDATE_AFTER){
+        } else if (row.getKind() == RowKind.UPDATE_AFTER) {
             ruleMetaBean.setOperateType("UPDATE");
-            setRuleMetaBeanAttributes(ruleMetaBean,row);
+            setRuleMetaBeanAttributes(ruleMetaBean, row);
 
         } else if (row.getKind() == RowKind.INSERT) {
             ruleMetaBean.setOperateType("INSERT");
-            setRuleMetaBeanAttributes(ruleMetaBean,row);
-        }else{
+            setRuleMetaBeanAttributes(ruleMetaBean, row);
+        } else {
             return null;
         }
 
@@ -55,20 +52,19 @@ public class Row2RuleMetaBeanMapFunction implements MapFunction<Row, RuleMetaBea
     }
 
 
-    public void setRuleMetaBeanAttributes(RuleMetaBean ruleMetaBean,Row row) throws IOException {
+    public void setRuleMetaBeanAttributes(RuleMetaBean ruleMetaBean, Row row) throws IOException {
         String ruleId = row.getFieldAs("rule_id");
         int ruleModelId = row.getFieldAs("rule_model_id");
         byte[] bitmapBytes = row.getFieldAs("rule_profile_user_bitmap");
 
         RoaringBitmap bitmap = null;
 
-        if(bitmapBytes != null) {
+        if (bitmapBytes != null) {
             bitmap = RoaringBitmap.bitmapOf();
             bitmap.deserialize(ByteBuffer.wrap(bitmapBytes));
         }
         String caculatorGroovyCode = row.getFieldAs("caculator_groovy_code");
         String ruleParamJson = row.getFieldAs("rule_param_json");
-
 
         String creatorName = row.getFieldAs("creator_name");
         int ruleStatus = row.getFieldAs("rule_status");

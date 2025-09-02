@@ -29,13 +29,13 @@ object MallUserRetentionRPT_A {
       "4,2022-07-25,2022-08-02", // 跨范围
       "5,2022-07-08,2022-07-10",
       "5,2022-08-18,2022-08-20", // 完全超出范围
-      "4,2022-08-08,2022-08-14"  // 完全超出范围
+      "4,2022-08-08,2022-08-14" // 完全超出范围
     ))
 
-    ds.map(s=>{
-      val strings = s.split(",")
-      (strings(0).toLong,strings(1),strings(2))
-    }).toDF("guid","range_start_dt","range_end_dt")
+    ds.map(s => {
+        val strings = s.split(",")
+        (strings(0).toLong, strings(1), strings(2))
+      }).toDF("guid", "range_start_dt", "range_end_dt")
       .createTempView("doitedu_mall_app_user_actrange")
 
 
@@ -127,17 +127,17 @@ object MallUserRetentionRPT_A {
      *
      * rangeLst :   [2022-07-01:2022-07-10, 2022-07-15:2022-07-17]
      */
-    val retentionJudge  = (rangeLst:Array[String], targetDate:String) => {
+    val retentionJudge = (rangeLst: Array[String], targetDate: String) => {
 
 
       // 遍历用户的每一个活跃区间
 
       var find = 0
 
-      for (range <- rangeLst if find==0) {
+      for (range <- rangeLst if find == 0) {
         val rangeStartAndEnd = range.split(":")
         // 如果该区间包含 要判断的 ”留存日期“ ，则返回1
-        if(targetDate >= rangeStartAndEnd(0)  && targetDate <= rangeStartAndEnd(1)) {
+        if (targetDate >= rangeStartAndEnd(0) && targetDate <= rangeStartAndEnd(1)) {
           find = 1
         }
       }
@@ -146,7 +146,7 @@ object MallUserRetentionRPT_A {
     }
 
 
-    spark.udf.register("retention_judge",retentionJudge)
+    spark.udf.register("retention_judge", retentionJudge)
 
 
     // 给每个人，打上 3种留存标记
@@ -192,15 +192,10 @@ object MallUserRetentionRPT_A {
         |from tmp3
         |group by month(first_login_dt),device_type
         |
-        |""".stripMargin).show(100,false)
-
-
-
-
+        |""".stripMargin).show(100, false)
 
 
     spark.close()
-
 
 
   }

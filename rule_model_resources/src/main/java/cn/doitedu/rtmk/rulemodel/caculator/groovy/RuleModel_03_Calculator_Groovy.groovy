@@ -32,7 +32,7 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
     @Override
     void init(JSONObject ruleDefineParamJsonObject, RoaringBitmap profileUserBitmap) {
 
-        this.jedis = new Jedis("doitedu",6379)
+        this.jedis = new Jedis("doitedu", 6379)
 
         this.ruleDefineParamJsonObject = ruleDefineParamJsonObject
         this.profileUserBitmap = profileUserBitmap
@@ -45,8 +45,6 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
         this.intervalTime = ruleDefineParamJsonObject.getLong("interval_time")
         this.maxMatchCount = ruleDefineParamJsonObject.getInteger("rule_match_count")
 
-
-
     }
 
     @Override
@@ -56,7 +54,7 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
 
 
     @Override
-    List<JSONObject> process(UserEvent userEvent,MapState<String,Long> timerState,TimerService timerService) {
+    List<JSONObject> process(UserEvent userEvent, MapState<String, Long> timerState, TimerService timerService) {
         List<JSONObject> resLst = new ArrayList<JSONObject>()
         // 判断是否是触发事件
         if (UserEventComparator.userEventIsEqualParam(userEvent, trigEventJsonObject)) {
@@ -69,20 +67,20 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
 
             // 从事件中拿到规则检查条件的事件属性
             String checkEventAttributeValue = userEvent.getProperties().get(this.checkEventAttribute)
-            log.info("注册定时器，此时的事件订单属性名：{}, 订单id:{}",checkEventAttribute,checkEventAttributeValue)
+            log.info("注册定时器，此时的事件订单属性名：{}, 订单id:{}", checkEventAttribute, checkEventAttributeValue)
 
             // 将定时器注册信息，记录到 timerState 状态中
             timerState.put(ruleId + ":" + checkEventAttributeValue, registerTime)
-            log.info("定时器注册信息放入state, key:{}, value:{}",ruleId + ":" + checkEventAttributeValue,registerTime)
+            log.info("定时器注册信息放入state, key:{}, value:{}", ruleId + ":" + checkEventAttributeValue, registerTime)
 
             JSONObject resObj = new JSONObject();
-            resObj.put("ruleId",ruleId)
-            resObj.put("resType","timerReg");
-            resObj.put("guid",userEvent.getGuid());
-            resObj.put("checkEventAttribute",checkEventAttribute);
-            resObj.put("checkEventAttributeValue",checkEventAttributeValue);
-            resObj.put("registerTimestamp",timerService.currentProcessingTime());
-            resObj.put("registeredTimeStamp",registerTime);
+            resObj.put("ruleId", ruleId)
+            resObj.put("resType", "timerReg");
+            resObj.put("guid", userEvent.getGuid());
+            resObj.put("checkEventAttribute", checkEventAttribute);
+            resObj.put("checkEventAttributeValue", checkEventAttributeValue);
+            resObj.put("registerTimestamp", timerService.currentProcessingTime());
+            resObj.put("registeredTimeStamp", registerTime);
             resLst.add(resObj)
 
         }
@@ -101,13 +99,13 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
                 timerState.remove(ruleId + ":" + checkEventAttributeValue)
             }
             JSONObject resObj = new JSONObject();
-            resObj.put("ruleId",ruleId)
-            resObj.put("resType","timerDel");
-            resObj.put("guid",userEvent.getGuid());
-            resObj.put("checkEventAttribute",checkEventAttribute);
-            resObj.put("checkEventAttributeValue",checkEventAttributeValue);
-            resObj.put("timestamp",timerService.currentProcessingTime());
-            resObj.put("registerTime",registerTime);
+            resObj.put("ruleId", ruleId)
+            resObj.put("resType", "timerDel");
+            resObj.put("guid", userEvent.getGuid());
+            resObj.put("checkEventAttribute", checkEventAttribute);
+            resObj.put("checkEventAttributeValue", checkEventAttributeValue);
+            resObj.put("timestamp", timerService.currentProcessingTime());
+            resObj.put("registerTime", registerTime);
             resLst.add(resObj)
         }
         return resLst
@@ -121,46 +119,46 @@ class RuleModel_03_Calculator_Groovy extends TimerRuleCalculator {
      * @return
      */
     @Override
-    List<JSONObject> onTimer(long timestamp, int guid ,MapState<String,Long> timerState,TimerService timerService) {
+    List<JSONObject> onTimer(long timestamp, int guid, MapState<String, Long> timerState, TimerService timerService) {
 
         List<JSONObject> onTimerResList = new ArrayList<JSONObject>()
-        log.info("定期器触发了，时间为：{} ",timestamp)
+        log.info("定期器触发了，时间为：{} ", timestamp)
 
         def entries = timerState.entries()
         String attributeValue = "";
-        for(Map.Entry<String,Long> entry: entries){
-            if(entry.getValue() == timestamp) {
+        for (Map.Entry<String, Long> entry : entries) {
+            if (entry.getValue() == timestamp) {
                 // ruleId + ":" + checkEventAttributeValue
                 String key = entry.getKey()
                 String[] keySplit = key.split(":")
                 attributeValue = keySplit[1]
-                log.info("找到了一个在此时间点注册了定时器的规则,规则:{},key:{},订单号:{}",ruleId,key,attributeValue)
+                log.info("找到了一个在此时间点注册了定时器的规则,规则:{},key:{},订单号:{}", ruleId, key, attributeValue)
 
                 // 查询出该用户该属性（订单）的规则触达次数
-                String realMatchCountStr = jedis.hget(ruleId + ":mcnt" , guid+":"+attributeValue)
-                int realMatchCount = realMatchCountStr == null ?  0 : Integer.parseInt(realMatchCountStr)
-                log.info("找到了这个订单的实际提醒次数,规则:{},订单号:{},触达次数:{}",ruleId,attributeValue,realMatchCount)
+                String realMatchCountStr = jedis.hget(ruleId + ":mcnt", guid + ":" + attributeValue)
+                int realMatchCount = realMatchCountStr == null ? 0 : Integer.parseInt(realMatchCountStr)
+                log.info("找到了这个订单的实际提醒次数,规则:{},订单号:{},触达次数:{}", ruleId, attributeValue, realMatchCount)
 
                 // 如果尚未达到触达上限
-                if(realMatchCount < maxMatchCount){
-                    log.info("这个订单的实际提醒次数没有达到上限:{},规则:{},订单号:{},触达次数:{}",maxMatchCount,ruleId,attributeValue,realMatchCount)
+                if (realMatchCount < maxMatchCount) {
+                    log.info("这个订单的实际提醒次数没有达到上限:{},规则:{},订单号:{},触达次数:{}", maxMatchCount, ruleId, attributeValue, realMatchCount)
                     // 封装要返回的触达结果
                     JSONObject resObj = new JSONObject();
-                    resObj.put("ruleId",ruleId);
-                    resObj.put("resType","match");
-                    resObj.put("guid",guid);
-                    resObj.put("attributeValue",attributeValue);
-                    resObj.put("timestamp",timerService.currentProcessingTime());
+                    resObj.put("ruleId", ruleId);
+                    resObj.put("resType", "match");
+                    resObj.put("guid", guid);
+                    resObj.put("attributeValue", attributeValue);
+                    resObj.put("timestamp", timerService.currentProcessingTime());
                     onTimerResList.add(resObj);
 
                     // 更新redis中的触达次数
-                    jedis.hincrBy(ruleId + ":mcnt" , guid+":"+attributeValue,1)
+                    jedis.hincrBy(ruleId + ":mcnt", guid + ":" + attributeValue, 1)
 
                     // 再次注册定时器
                     long registerTime = this.intervalTime + timestamp
                     timerService.registerProcessingTimeTimer(registerTime)
                     timerState.put(ruleId + ":" + attributeValue, registerTime)
-                    log.info("再次注册定时器:规则:{},订单号:{},注册时间:{}",ruleId,attributeValue,registerTime)
+                    log.info("再次注册定时器:规则:{},订单号:{},注册时间:{}", ruleId, attributeValue, registerTime)
 
                 }
             }

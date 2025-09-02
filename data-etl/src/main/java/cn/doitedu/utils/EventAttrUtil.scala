@@ -7,14 +7,13 @@ object EventAttrUtil {
    * eventSeq ==>  ["e3","e2","e3","e2","e1"]
    * eventSeq ==>  ["e1"]
    */
-  def firstTouchAttr(eventSeq:Array[String]):(String,Double) ={
-    if(eventSeq.length > 1) {
-      (eventSeq(0),1.0)
-    }else{
-      (null,0.0)
+  def firstTouchAttr(eventSeq: Array[String]): (String, Double) = {
+    if (eventSeq.length > 1) {
+      (eventSeq(0), 1.0)
+    } else {
+      (null, 0.0)
     }
   }
-
 
 
   /**
@@ -22,22 +21,21 @@ object EventAttrUtil {
    * eventSeq ==>  ["e3","e2","e3","e2","e1"]
    * eventSeq ==>  ["e1"]
    */
-  def lastTouchAttr(eventSeq:Array[String]):(String,Double) ={
-    if(eventSeq.length > 1) {
-      (eventSeq(eventSeq.length-2),1.0)  // [e3,e1]
-    }else{
-      (null,0.0)
+  def lastTouchAttr(eventSeq: Array[String]): (String, Double) = {
+    if (eventSeq.length > 1) {
+      (eventSeq(eventSeq.length - 2), 1.0) // [e3,e1]
+    } else {
+      (null, 0.0)
     }
   }
-
 
 
   /**
    * 线性归因算法
    * eventSeq ==>  ["e3","e2","e3","e2","e1"]
    */
-  def linearAttr(eventSeq:Array[String]):List[(String,Double)] ={
-    if(eventSeq.length > 1) {
+  def linearAttr(eventSeq: Array[String]): List[(String, Double)] = {
+    if (eventSeq.length > 1) {
 
       // ["e3","e2","e3","e2","e1"] => [(e3,0.2),(e2,0.2),(e3,0.2),(e2,0.2),(e1,0.2)]
       val res: Map[String, Double] = eventSeq
@@ -50,8 +48,8 @@ object EventAttrUtil {
 
       res.toList
 
-    }else{
-      List((null,0.0))
+    } else {
+      List((null, 0.0))
     }
   }
 

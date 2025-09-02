@@ -28,7 +28,7 @@ public class ProfileConditionQueryServiceImpl implements ProfileConditionQuerySe
     SearchRequest request;
 
     // 构造es连接客户端
-    public ProfileConditionQueryServiceImpl(){
+    public ProfileConditionQueryServiceImpl() {
 
         client = new RestHighLevelClient(RestClient.builder(new HttpHost("doitedu", 9200, "http")));
         request = new SearchRequest("doeusers");
@@ -36,14 +36,15 @@ public class ProfileConditionQueryServiceImpl implements ProfileConditionQuerySe
     }
 
     // 接口文档：
-    // [{"tagId":"tg01","compareType":"eq","compareValue":"3"},{"tagId":"tg04","compareType":"match","compareValue":"运动"}]
+    // [{"tagId":"tg01","compareType":"eq","compareValue":"3"},{"tagId":"tg04","compareType":"match",
+    // "compareValue":"运动"}]
     @Override
     public RoaringBitmap queryProfileUsers(JSONArray jsonArray) throws IOException {
 
         // 构造一个组合条件查询参数构建器
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-        for(int i = 0; i< jsonArray.size() ;i ++) {
+        for (int i = 0; i < jsonArray.size(); i++) {
             // {"tagId":"tg01","compareType":"eq","compareValue":"3"}
             JSONObject paramObject = jsonArray.getJSONObject(i);
 
@@ -51,40 +52,40 @@ public class ProfileConditionQueryServiceImpl implements ProfileConditionQuerySe
             String compareType = paramObject.getString("compareType");
             String compareValue = paramObject.getString("compareValue");
 
-            switch (compareType){
+            switch (compareType) {
                 case "lt":
                     RangeQueryBuilder lt = QueryBuilders.rangeQuery(tagId).lt(compareValue);
-                    if(compareValue.matches("\\d+(.\\d+)?")){
+                    if (compareValue.matches("\\d+(.\\d+)?")) {
                         lt = QueryBuilders.rangeQuery(tagId).lt(Float.parseFloat(compareValue));
                     }
                     boolQueryBuilder.must(lt);
                     break;
                 case "gt":
                     RangeQueryBuilder gt = QueryBuilders.rangeQuery(tagId).gt(compareValue);
-                    if(compareValue.matches("\\d+(.\\d+)?")){
+                    if (compareValue.matches("\\d+(.\\d+)?")) {
                         gt = QueryBuilders.rangeQuery(tagId).gt(Float.parseFloat(compareValue));
                     }
                     boolQueryBuilder.must(gt);
                     break;
                 case "ge":
                     RangeQueryBuilder gte = QueryBuilders.rangeQuery(tagId).gte(compareValue);
-                    if(compareValue.matches("\\d+(.\\d+)?")){
+                    if (compareValue.matches("\\d+(.\\d+)?")) {
                         gte = QueryBuilders.rangeQuery(tagId).gte(Float.parseFloat(compareValue));
                     }
                     boolQueryBuilder.must(gte);
                     break;
                 case "le":
                     RangeQueryBuilder lte = QueryBuilders.rangeQuery(tagId).lte(compareValue);
-                    if(compareValue.matches("\\d+(.\\d+)?")){
+                    if (compareValue.matches("\\d+(.\\d+)?")) {
                         lte = QueryBuilders.rangeQuery(tagId).lte(Float.parseFloat(compareValue));
                     }
                     boolQueryBuilder.must(lte);
                     break;
                 case "between":
                     String[] fromTo = compareValue.split(",");
-                    RangeQueryBuilder btw = QueryBuilders.rangeQuery(tagId).from(fromTo[0],true).to(fromTo[1],true);
-                    if(fromTo[0].matches("\\d+(.\\d+)?") && fromTo[1].matches("\\d+(.\\d+)?")){
-                        btw = QueryBuilders.rangeQuery(tagId).from(Float.parseFloat(fromTo[0]),true).to(Float.parseFloat(fromTo[1]),true);
+                    RangeQueryBuilder btw = QueryBuilders.rangeQuery(tagId).from(fromTo[0], true).to(fromTo[1], true);
+                    if (fromTo[0].matches("\\d+(.\\d+)?") && fromTo[1].matches("\\d+(.\\d+)?")) {
+                        btw = QueryBuilders.rangeQuery(tagId).from(Float.parseFloat(fromTo[0]), true).to(Float.parseFloat(fromTo[1]), true);
                     }
                     boolQueryBuilder.must(btw);
                     break;

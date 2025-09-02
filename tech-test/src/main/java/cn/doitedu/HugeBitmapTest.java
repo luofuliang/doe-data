@@ -15,7 +15,7 @@ public class HugeBitmapTest {
 
         RoaringBitmap bm = RoaringBitmap.bitmapOf();
 
-        for(int i=0;i<100000000;i++){
+        for (int i = 0; i < 100000000; i++) {
             bm.add(i);
         }
 
@@ -31,8 +31,8 @@ public class HugeBitmapTest {
 
         Connection connection = DriverManager.getConnection("jdbc:mysql://doitedu:3306/rtmk", "root", "root");
         PreparedStatement stmt = connection.prepareStatement("insert into bm_test (id,bm) values(?,?)");
-        stmt.setInt(1,1);
-        stmt.setBytes(2,bout.toByteArray());
+        stmt.setInt(1, 1);
+        stmt.setBytes(2, bout.toByteArray());
         stmt.execute();
 
         dout.close();

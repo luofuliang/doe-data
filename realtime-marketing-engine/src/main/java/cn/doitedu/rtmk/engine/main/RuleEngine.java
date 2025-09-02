@@ -77,10 +77,12 @@ public class RuleEngine {
         Table table = tenv.sqlQuery("select * from rule_meta_cdc");
         DataStream<Row> rowDataStream = tenv.toChangelogStream(table);
 
-        DataStream<RuleMetaBean> ruleMetaBeanStream = rowDataStream.map(new Row2RuleMetaBeanMapFunction()).filter(Objects::nonNull);
+        DataStream<RuleMetaBean> ruleMetaBeanStream =
+                rowDataStream.map(new Row2RuleMetaBeanMapFunction()).filter(Objects::nonNull);
 
         // 将规则元信息流广播出去
-        BroadcastStream<RuleMetaBean> ruleMetaBeanBroadcastStream = ruleMetaBeanStream.broadcast(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        BroadcastStream<RuleMetaBean> ruleMetaBeanBroadcastStream =
+                ruleMetaBeanStream.broadcast(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
 
 
         // 连接用户行为事件流  和  规则变更数据流
@@ -93,7 +95,6 @@ public class RuleEngine {
         // 打印规则匹配结果
         resultStream.print("main");
         resultStream.getSideOutput(new OutputTag<JSONObject>("ruleStatInfo", TypeInformation.of(JSONObject.class))).print("stat");
-
 
         env.execute();
     }

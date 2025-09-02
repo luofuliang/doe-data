@@ -14,19 +14,19 @@ public class MallAppTrafficReport1 {
         // 创建连接器表，来读取流量分析的dws层中间表
         tenv.executeSql(
                 " CREATE TABLE dws_traffic_analyse (    " +
-                        " guid              BIGINT,  "+
-                        " sessionId         STRING,  "+
-                        " splitSessionId    STRING,  "+
-                        " eventId           STRING,  "+
-                        " ts                BIGINT,  "+
-                        " pageId            STRING,  "+
-                        " pageLoadTime      BIGINT,  "+
-                        " province          STRING,  "+
-                        " city              STRING,  "+
-                        " region            STRING,  "+
-                        " deviceType        STRING,  "+
-                        " isNew             INT   ,  "+
-                        " releaseChannel    STRING   "+
+                        " guid              BIGINT,  " +
+                        " sessionId         STRING,  " +
+                        " splitSessionId    STRING,  " +
+                        " eventId           STRING,  " +
+                        " ts                BIGINT,  " +
+                        " pageId            STRING,  " +
+                        " pageLoadTime      BIGINT,  " +
+                        " province          STRING,  " +
+                        " city              STRING,  " +
+                        " region            STRING,  " +
+                        " deviceType        STRING,  " +
+                        " isNew             INT   ,  " +
+                        " releaseChannel    STRING   " +
                         " ) WITH (                                                " +
                         "  'connector' = 'kafka',                                 " +
                         "  'topic' = 'dws-traffic-analyse',                       " +
@@ -37,8 +37,6 @@ public class MallAppTrafficReport1 {
                         " )                                                       ");
 
         tenv.executeSql("select * from dws_traffic_analyse")/*.print()*/;
-
-
 
 
         // 创建输出到mysql的连接器表
@@ -66,28 +64,28 @@ public class MallAppTrafficReport1 {
 
         // 报表统计，并输出实时统计结果 到  mysql
 
-        tenv.executeSql(" INSERT INTO  rt_traffic_rpt1                 "+
-                " SELECT                                                        "+
-                "   dt,                                                         "+
-                "   sum(pv) as pv_amt,                                          "+
-                "   count(distinct guid) as uv_amt,                             "+
-                "   count(1) as session_amt,                                    "+
-                "   max(session_timelong) as max_session_timelong,              "+
-                "   min(session_timelong) as min_session_timelong,              "+
-                "   avg(session_timelong) as avg_session_timelong               "+
-                " FROM                                                          "+
-                " (                                                             "+
-                "    SELECT                                                     "+
-                "      date_format(to_timestamp_ltz(ts,3),'yyyy-MM-dd') AS dt,  "+
-                "      splitSessionId as session_id,                            "+
-                "      guid,                                                    "+
-                "      count(if(eventId='pageLoad',1,cast('' as int))) as pv,   "+
-                "      max(ts) - min(ts) as session_timelong                    "+
-                "    from  dws_traffic_analyse                                  "+
-                "    group by                                                   "+
-                "      date_format(to_timestamp_ltz(ts,3),'yyyy-MM-dd'),        "+
-                "      splitSessionId,guid                                      "+
-                " )                                                             "+
+        tenv.executeSql(" INSERT INTO  rt_traffic_rpt1                 " +
+                " SELECT                                                        " +
+                "   dt,                                                         " +
+                "   sum(pv) as pv_amt,                                          " +
+                "   count(distinct guid) as uv_amt,                             " +
+                "   count(1) as session_amt,                                    " +
+                "   max(session_timelong) as max_session_timelong,              " +
+                "   min(session_timelong) as min_session_timelong,              " +
+                "   avg(session_timelong) as avg_session_timelong               " +
+                " FROM                                                          " +
+                " (                                                             " +
+                "    SELECT                                                     " +
+                "      date_format(to_timestamp_ltz(ts,3),'yyyy-MM-dd') AS dt,  " +
+                "      splitSessionId as session_id,                            " +
+                "      guid,                                                    " +
+                "      count(if(eventId='pageLoad',1,cast('' as int))) as pv,   " +
+                "      max(ts) - min(ts) as session_timelong                    " +
+                "    from  dws_traffic_analyse                                  " +
+                "    group by                                                   " +
+                "      date_format(to_timestamp_ltz(ts,3),'yyyy-MM-dd'),        " +
+                "      splitSessionId,guid                                      " +
+                " )                                                             " +
                 " GROUP BY dt                                                   "
         );
     }

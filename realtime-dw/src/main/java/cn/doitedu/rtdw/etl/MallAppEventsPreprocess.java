@@ -55,8 +55,6 @@ public class MallAppEventsPreprocess {
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
 
 
-
-
         // 从kafka读入商城用户行为日志
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers("doitedu:9092")
@@ -121,8 +119,8 @@ public class MallAppEventsPreprocess {
          * 使用的方式，是用flinksql的连接器表
          */
         // 注册成 flinksql的表（视图）
-        tEnv.createTemporaryView("logdetail",resultStream, Schema.newBuilder()
-                .columnByExpression("dw_date","date_format(from_unixtime(`timestamp`/1000),'yyyy-MM-dd')")  // 衍生字段
+        tEnv.createTemporaryView("logdetail", resultStream, Schema.newBuilder()
+                .columnByExpression("dw_date", "date_format(from_unixtime(`timestamp`/1000),'yyyy-MM-dd')")  // 衍生字段
                 .build());
 
         // 创建doris sink连接器表 : doris_appdetail_sink
@@ -156,7 +154,8 @@ public class MallAppEventsPreprocess {
                 .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
         // 输出解析失败的gps座标
-        DataStream<String> unknowGpsStream = resultStream.getSideOutput((new OutputTag<String>("unknown_gps", TypeInformation.of(String.class))));
+        DataStream<String> unknowGpsStream = resultStream.getSideOutput((new OutputTag<String>("unknown_gps",
+                TypeInformation.of(String.class))));
         unknowGpsStream.sinkTo(unknownGpsSink);
 
 

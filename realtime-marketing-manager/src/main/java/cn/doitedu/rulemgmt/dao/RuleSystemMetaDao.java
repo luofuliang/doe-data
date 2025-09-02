@@ -9,12 +9,12 @@ public interface RuleSystemMetaDao {
     String queryGroovyTemplateByModelId(int ruleModelId) throws SQLException;
 
     boolean insertRuleInfo(String rule_id,
-                        int rule_model_id,
-                        String creator_name,
-                        int rule_status,
-                        Timestamp create_time,
-                        Timestamp update_time,
-                        byte[] bitmapBytes,
-                        String ruleDefineParamsJson,
-                        String ruleModelCaculatorGroovyCode) throws SQLException;
+                           int rule_model_id,
+                           String creator_name,
+                           int rule_status,
+                           Timestamp create_time,
+                           Timestamp update_time,
+                           byte[] bitmapBytes,
+                           String ruleDefineParamsJson,
+                           String ruleModelCaculatorGroovyCode) throws SQLException;
 }

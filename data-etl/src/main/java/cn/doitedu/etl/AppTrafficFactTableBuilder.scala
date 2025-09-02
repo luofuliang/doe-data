@@ -17,7 +17,7 @@ case class PageBean(
                      session_endtime: Long
                    )
 
-case class ResultBean(dt:String ,guid: Long, session_id: String, page_id: String, pv_cnt: Int, page_staytime: Long, pv_contribute_d: Int, pv_contribute_w: Int)
+case class ResultBean(dt: String, guid: Long, session_id: String, page_id: String, pv_cnt: Int, page_staytime: Long, pv_contribute_d: Int, pv_contribute_w: Int)
 
 object AppTrafficFactTableBuilder {
 
@@ -27,8 +27,8 @@ object AppTrafficFactTableBuilder {
       .master("local")
       .appName("商城app流量分析-星型模型-事实表计算")
       .enableHiveSupport()
-      .config("spark.sql.shuffle.partitions","2")
-      .config("hive.exec.dynamic.partition.mode","nonstrict")
+      .config("spark.sql.shuffle.partitions", "2")
+      .config("hive.exec.dynamic.partition.mode", "nonstrict")
       .getOrCreate()
 
 
@@ -80,7 +80,7 @@ object AppTrafficFactTableBuilder {
      * PageBean(1846,ZYBFEFJFQW,page043,index,1658043581146,1658043592901)
      * PageBean(1846,ZYBFEFJFQW,page001,index,1658043582115,1658043592901)
      * PageBean(1846,ZYBFEFJFQW,page023,index,1658043583601,1658043592901)
-
+     *
      * PageBean(1846,ZYBFEFJFQW,page045,page023,1658043589124,1658043592901)
      */
 
@@ -174,7 +174,7 @@ object AppTrafficFactTableBuilder {
        */
 
       for (kv <- pagePvs) yield {
-        ResultBean("2022-07-16",tp._1._1, tp._1._2, kv._1, kv._2, pageStaytimeMap.getOrElse(kv._1, 0L), directContributeMap.getOrElse(kv._1, 0), wholeContributeMap.getOrElse(kv._1, 0))
+        ResultBean("2022-07-16", tp._1._1, tp._1._2, kv._1, kv._2, pageStaytimeMap.getOrElse(kv._1, 0L), directContributeMap.getOrElse(kv._1, 0), wholeContributeMap.getOrElse(kv._1, 0))
       }
 
 

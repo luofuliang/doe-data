@@ -81,9 +81,6 @@ class RuleModel_02_Calculator_Groovy implements RuleCalculator {
         // 构造一个匹配结果输出对象
         resultObject = new JSONObject();
         resultObject.put("ruleId", ruleId)
-
-
-
     }
 
 

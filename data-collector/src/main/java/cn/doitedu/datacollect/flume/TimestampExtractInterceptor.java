@@ -18,7 +18,6 @@ public class TimestampExtractInterceptor implements Interceptor {
         this.timeField = timeField;
     }
 
-
     /**
      * 初始化方法：当拦截器类被实例化后，会调用一次的方法
      */
@@ -37,7 +36,7 @@ public class TimestampExtractInterceptor implements Interceptor {
     @Override
     public Event intercept(Event event) {
         // 还多放入一个header 数据（用来支撑下游的 channel selector 进行负载均衡）
-        event.getHeaders().put("cs", RandomUtils.nextInt(2)+"");
+        event.getHeaders().put("cs", RandomUtils.nextInt(2) + "");
 
         try {
             // 要从event中拿到日志json字符串
@@ -51,15 +50,13 @@ public class TimestampExtractInterceptor implements Interceptor {
             // 将时间戳，放入event的 headers中
             event.getHeaders().put("timestamp", eventTime + "");
 
-
-
             // 返回 event
             return event;
 
         } catch (Exception e) {
             e.printStackTrace();
 
-            event.getHeaders().put("timestamp","0");
+            event.getHeaders().put("timestamp", "0");
             return event;
         }
 
@@ -121,6 +118,4 @@ public class TimestampExtractInterceptor implements Interceptor {
 
         }
     }
-
-
 }

@@ -71,7 +71,7 @@ class RuleModel_01_Calculator_Groovy implements RuleCalculator {
                 // 如果是触发事件，则判断本行为人是否已经满足了本规则的所有条件
                 boolean isMatch = isMatch(userEvent.getGuid());
 
-                log.info("用户:{} ,触发事件:{},规则:{},规则匹配结果:{}",userEvent.getGuid(),userEvent.getEventId(),ruleId,isMatch);
+                log.info("用户:{} ,触发事件:{},规则:{},规则匹配结果:{}", userEvent.getGuid(), userEvent.getEventId(), ruleId, isMatch);
 
                 // 如果已满足，则输出本规则的触达信息
                 if (isMatch) {
@@ -123,7 +123,7 @@ class RuleModel_01_Calculator_Groovy implements RuleCalculator {
                 Integer conditionId = eventParam.getInteger("conditionId");
 
                 // 2. 判断当前输入的事件是否匹配条件参数中要求的事件
-                if(UserEventComparator.userEventIsEqualParam(userEvent,eventParam)){
+                if (UserEventComparator.userEventIsEqualParam(userEvent, eventParam)) {
                     log.info("用户输入事件，与规则条件的事件参数吻合，即将更新redis的计算结果")
 
 

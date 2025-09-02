@@ -13,12 +13,11 @@ object MallEventAttribute {
       .enableHiveSupport()
       .master("local")
       .config("spark.sql.shuffle.partitions", "1")
-      .config("spark.sql.hive.convertMetastoreParquet","false")
-      .config("spark.sql.hive.convertMetastoreOrc","false")
+      .config("spark.sql.hive.convertMetastoreParquet", "false")
+      .config("spark.sql.hive.convertMetastoreOrc", "false")
       .getOrCreate()
 
     import spark.implicits._
-
 
 
     val df = spark.sql(
@@ -96,8 +95,8 @@ object MallEventAttribute {
     })
 
 
-    resultRdd.toDF("guid","attr_method","attr_event","attr_weight")
-      .show(100,false)
+    resultRdd.toDF("guid", "attr_method", "attr_event", "attr_weight")
+      .show(100, false)
 
     spark.close()
   }

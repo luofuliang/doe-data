@@ -29,7 +29,6 @@ class ActionRuleCalc implements IActionRuleCalc {
         this.eventSeq = ruleParam.getJSONArray("eventSeq").toJavaList(String.class)
         this.minCount = ruleParam.getInteger("minCount")
         this.maxCount = ruleParam.getInteger("maxCount")
-
     }
 
     /**
@@ -58,8 +57,8 @@ class ActionRuleCalc implements IActionRuleCalc {
 
                 // 如果该用户该条件在redis中的查询结果是已经满足，则直接返回
                 // 主要是为了job重启后且flink内部状态有丢失的情况下，可以快速重建已完成状态
-                if(cflag==1) {
-                    flinkMapState.put(ruleId + ":" + conditionId + ":" + userId,1)
+                if (cflag == 1) {
+                    flinkMapState.put(ruleId + ":" + conditionId + ":" + userId, 1)
                     return true
                 }
             }
@@ -86,7 +85,7 @@ class ActionRuleCalc implements IActionRuleCalc {
                     // 已经完全满足条件,则将该用户的满足状态直接放入flink state中，以避免无谓的redis查询
                     if (res) {
                         flinkMapState.put(ruleId + ":" + conditionId + ":" + userId, 1)
-                        redisJsonObject.put("cflag",1)
+                        redisJsonObject.put("cflag", 1)
                     }
                 }
 

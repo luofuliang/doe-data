@@ -20,27 +20,28 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 /**
- {
- "eventId":"share",
- "attributeParams":[
- {
- "attributeName":"pageId",
- "compareType":"=",
- "compareValue":"page001"
- },
- {
- "attributeName":"itemId",
- "compareType":">",
- "compareValue":"item002"
- }
- ],
- "windowStart":"2022-08-01 12:00:00",
- "windowEnd":"2022-08-30 12:00:00",
- "eventCount":3,
- "conditionId":1,
- "dorisQueryTemplate":"action_count"
- }
+ * {
+ * "eventId":"share",
+ * "attributeParams":[
+ * {
+ * "attributeName":"pageId",
+ * "compareType":"=",
+ * "compareValue":"page001"
+ * },
+ * {
+ * "attributeName":"itemId",
+ * "compareType":">",
+ * "compareValue":"item002"
+ * }
+ * ],
+ * "windowStart":"2022-08-01 12:00:00",
+ * "windowEnd":"2022-08-30 12:00:00",
+ * "eventCount":3,
+ * "conditionId":1,
+ * "dorisQueryTemplate":"action_count"
+ * }
  */
 @Slf4j
 @Service
@@ -50,13 +51,15 @@ public class ActionConditionQueryServiceImpl implements ActionConditionQueryServ
     private final DorisQueryDaoImpl dorisQueryDaoImpl;
 
     @Autowired
-    public ActionConditionQueryServiceImpl(RuleSystemMetaDaoImpl ruleSystemMetaDao, DorisQueryDaoImpl dorisQueryDaoImpl) {
+    public ActionConditionQueryServiceImpl(RuleSystemMetaDaoImpl ruleSystemMetaDao,
+                                           DorisQueryDaoImpl dorisQueryDaoImpl) {
         this.ruleSystemMetaDao = ruleSystemMetaDao;
         this.dorisQueryDaoImpl = dorisQueryDaoImpl;
     }
 
     @Override
-    public void processActionCountCondition(JSONObject eventParamJsonObject, String ruleId, RoaringBitmap profileBitmap) throws SQLException {
+    public void processActionCountCondition(JSONObject eventParamJsonObject, String ruleId,
+                                            RoaringBitmap profileBitmap) throws SQLException {
 
         // 从事件次数条件中，取出各条件参数
         String eventId = eventParamJsonObject.getString("eventId");
@@ -68,28 +71,30 @@ public class ActionConditionQueryServiceImpl implements ActionConditionQueryServ
 
         // 将事件属性参数，封装到一个list中
         ArrayList<ActionAttributeParam> attrParamList = new ArrayList<>();
-        for(int i=0;i<attributeParamsJsonArray.size();i++){
+        for (int i = 0; i < attributeParamsJsonArray.size(); i++) {
             JSONObject paramJsonObject = attributeParamsJsonArray.getJSONObject(i);
-            ActionAttributeParam param = new ActionAttributeParam(paramJsonObject.getString("attributeName"), paramJsonObject.getString("compareType"), paramJsonObject.getString("compareValue"));
+            ActionAttributeParam param = new ActionAttributeParam(paramJsonObject.getString("attributeName"),
+                    paramJsonObject.getString("compareType"), paramJsonObject.getString("compareValue"));
             attrParamList.add(param);
         }
 
         // 构造模板渲染用的数据封装
         HashMap<String, Object> data = new HashMap<>();
-        data.put("eventId",eventId);
-        data.put("windowStart",windowStart);
-        data.put("windowEnd",windowEnd);
-        data.put("attrParamList",attrParamList);
+        data.put("eventId", eventId);
+        data.put("windowStart", windowStart);
+        data.put("windowEnd", windowEnd);
+        data.put("attrParamList", attrParamList);
 
         // 调用 dao类，来查询规则系统的元数据库中，行为次数条件所对应的doris查询sql模板
-        String sqlTemplateStr = ruleSystemMetaDao.getSqlTemplateByTemplateName(eventParamJsonObject.getString("dorisQueryTemplate"));
+        String sqlTemplateStr = ruleSystemMetaDao.getSqlTemplateByTemplateName(eventParamJsonObject.getString(
+                "dorisQueryTemplate"));
 
         // 利用enjoy模板引擎，通过规则参数，来动态拼接真正的查询sql
         Template template = Engine.use().getTemplateByString(sqlTemplateStr);
         String sql = template.renderToString(data);
 
         // 调用doris查询dao，去执行这个sql，得到结果
-        dorisQueryDaoImpl.queryActionCount(sql,ruleId,conditionId+"" ,profileBitmap);
+        dorisQueryDaoImpl.queryActionCount(sql, ruleId, conditionId + "", profileBitmap);
 
 
     }
@@ -100,9 +105,9 @@ public class ActionConditionQueryServiceImpl implements ActionConditionQueryServ
         HashMap<String, Object> data = new HashMap<>();
 
         // 将需要的数据放入enjoy引擎的渲染数据载体中
-        data.put("windowStart",actionSeqParam.getWindowStart());
-        data.put("windowEnd",actionSeqParam.getWindowEnd());
-        data.put("eventParams",actionSeqParam.getEventParams());
+        data.put("windowStart", actionSeqParam.getWindowStart());
+        data.put("windowEnd", actionSeqParam.getWindowEnd());
+        data.put("eventParams", actionSeqParam.getEventParams());
 
 
         // 利用enjoy模板引擎，通过规则参数，来动态拼接真正的查询sql
@@ -110,19 +115,18 @@ public class ActionConditionQueryServiceImpl implements ActionConditionQueryServ
         String sqlTemplateStr = ruleSystemMetaDao.getSqlTemplateByTemplateName(actionSeqParam.getDorisQueryTemplate());
         Template template = Engine.use().getTemplateByString(sqlTemplateStr);
         String sql = template.renderToString(data);
-        log.info("行为序列条件的doris查询sql: {}",sql);
+        log.info("行为序列条件的doris查询sql: {}", sql);
 
         // 调用doris查询dao，去执行这个sql，得到结果
-        dorisQueryDaoImpl.queryActionSeq(sql,ruleId, actionSeqParam ,profileBitmap);
+        dorisQueryDaoImpl.queryActionSeq(sql, ruleId, actionSeqParam, profileBitmap);
 
     }
 
 
-
-
     public static void main(String[] args) throws SQLException {
 
-        ActionConditionQueryServiceImpl service = new ActionConditionQueryServiceImpl(new RuleSystemMetaDaoImpl(),new DorisQueryDaoImpl());
+        ActionConditionQueryServiceImpl service = new ActionConditionQueryServiceImpl(new RuleSystemMetaDaoImpl(),
+                new DorisQueryDaoImpl());
         String conditionJson = "  {\n" +
                 " \"eventId\":\"share\",\n" +
                 " \"attributeParams\":[\n" +
@@ -146,7 +150,7 @@ public class ActionConditionQueryServiceImpl implements ActionConditionQueryServ
 
         JSONObject jsonObject = JSON.parseObject(conditionJson);
 
-        service.processActionCountCondition(jsonObject,"rule001",RoaringBitmap.bitmapOf(1,2,3,4));
+        service.processActionCountCondition(jsonObject, "rule001", RoaringBitmap.bitmapOf(1, 2, 3, 4));
 
 
     }

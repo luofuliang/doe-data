@@ -20,7 +20,7 @@ public class KafkaBitmapSerializer implements Serializer<RoaringBitmap> {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
         byte[] bytes = new byte[0];
-        if(bm != null) {
+        if (bm != null) {
             try {
                 bm.serialize(dos);
                 bytes = bos.toByteArray();

@@ -28,7 +28,8 @@ public class GeoHashAreaQueryFunction extends KeyedProcessFunction<String, Event
     }
 
     @Override
-    public void processElement(EventBean bean, KeyedProcessFunction<String, EventBean, EventBean>.Context ctx, Collector<EventBean> out) throws Exception {
+    public void processElement(EventBean bean, KeyedProcessFunction<String, EventBean, EventBean>.Context ctx,
+                               Collector<EventBean> out) throws Exception {
 
         String geoHashCode = bean.getGeoHashCode();
         String province = "未知";
@@ -63,8 +64,9 @@ public class GeoHashAreaQueryFunction extends KeyedProcessFunction<String, Event
         out.collect(bean);
 
         // 如果地理位置解析失败，则将本条数据的gps座标，输出到测流
-        if(!flag ) {
-            ctx.output(new OutputTag<String>("unknown_gps", TypeInformation.of(String.class)), bean.getLatitude() + "," + bean.getLongitude());
+        if (!flag) {
+            ctx.output(new OutputTag<String>("unknown_gps", TypeInformation.of(String.class)), bean.getLatitude() +
+                    "," + bean.getLongitude());
         }
     }
 

@@ -30,7 +30,6 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 public class MysqlFlinkcdc2Doris {
     public static void main(String[] args) {
 
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.enableCheckpointing(2000, CheckpointingMode.EXACTLY_ONCE);
         env.getCheckpointConfig().setCheckpointStorage("file:/d:/checkpoint");
@@ -79,9 +78,6 @@ public class MysqlFlinkcdc2Doris {
 
         // insert into .. select ..
         tenv.executeSql("insert into flink_doris_sink_stuscore select * from flink_mysql_cdc_stuscore");
-
-
-
 
     }
 }

@@ -12,9 +12,11 @@ import java.util.List;
  */
 public abstract class TimerRuleCalculator implements RuleCalculator {
 
-    public abstract List<JSONObject> onTimer(long timestamp, int guid,MapState<String,Long> timerState,TimerService timerService);
+    public abstract List<JSONObject> onTimer(long timestamp, int guid, MapState<String, Long> timerState,
+                                             TimerService timerService);
 
-    public abstract List<JSONObject> process(UserEvent userEvent,MapState<String,Long> timerState,TimerService timerService);
+    public abstract List<JSONObject> process(UserEvent userEvent, MapState<String, Long> timerState,
+                                             TimerService timerService);
 
     @Override
     public void calc(UserEvent userEvent) {

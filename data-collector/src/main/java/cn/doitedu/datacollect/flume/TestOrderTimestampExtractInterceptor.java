@@ -120,6 +120,4 @@ public class TestOrderTimestampExtractInterceptor implements Interceptor {
 
         }
     }
-
-
 }

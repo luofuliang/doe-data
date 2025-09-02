@@ -44,7 +44,7 @@ public class MallAppTrafficDwsEtl {
         DataStream<EventBean> beanStream = sourceStream.map(json -> JSON.parseObject(json, EventBean.class));
 
         DataStream<TrafficBean> trafficStream = beanStream
-                .keyBy(new KeySelector<EventBean, Tuple2<Long,String>>() {
+                .keyBy(new KeySelector<EventBean, Tuple2<Long, String>>() {
                     @Override
                     public Tuple2<Long, String> getKey(EventBean value) throws Exception {
                         return Tuple2.of(value.getGuid(), value.getSessionid());
@@ -65,7 +65,7 @@ public class MallAppTrafficDwsEtl {
 
         // 将结果数据，转成json输出到kafka
         trafficStream.map(JSON::toJSONString)
-                        .sinkTo(resultSink);
+                .sinkTo(resultSink);
 
         env.execute();
 

@@ -101,9 +101,8 @@ public class Test_Rulemodel_01_calculatorTemplate {
                 "}";
 
 
-
-
-        Template template = Engine.use().getTemplate("D:\\IdeaProjects\\doe-data\\rule_model_resources\\templates\\rule_calculator\\rulemodel_01_caculator.template");
+        Template template = Engine.use().getTemplate("D:\\IdeaProjects\\doe-data\\rule_model_resources\\templates" +
+                "\\rule_calculator\\rulemodel_01_caculator.template");
 
         HashMap<String, Object> data = new HashMap<>();
 
@@ -117,10 +116,8 @@ public class Test_Rulemodel_01_calculatorTemplate {
         String combineExpr = actionCountCondition.getString("combineExpr");
 
 
-
-
         data.put("eventParams", new int[eventPamramsSize]);
-        data.put("combineExpr",combineExpr);
+        data.put("combineExpr", combineExpr);
 
         // 渲染groovy代码
         String code = template.renderToString(data);
@@ -133,7 +130,7 @@ public class Test_Rulemodel_01_calculatorTemplate {
         Class aClass = new GroovyClassLoader().parseClass(code);
         RuleCalculator caculator = (RuleCalculator) aClass.newInstance();
         // 先初始化
-        caculator.init(ruleDefineJsonObject,RoaringBitmap.bitmapOf(1,2,3,4,5));
+        caculator.init(ruleDefineJsonObject, RoaringBitmap.bitmapOf(1, 2, 3, 4, 5));
 
         /**
          * 测试规则参数：
@@ -145,20 +142,20 @@ public class Test_Rulemodel_01_calculatorTemplate {
          */
         // 造一个用户事件
         HashMap<String, String> properties = new HashMap<>();
-        properties.put("p1","v1");
-        properties.put("p2","v3");
+        properties.put("p1", "v1");
+        properties.put("p2", "v3");
         UserEvent e1 = new UserEvent(1, "e1", properties, 1661046973000L);
 
         HashMap<String, String> properties5 = new HashMap<>();
-        properties5.put("p1","v2");
-        properties5.put("p2","v3");
+        properties5.put("p1", "v2");
+        properties5.put("p2", "v3");
         UserEvent e5 = new UserEvent(1, "e5", properties, 1661046973000L);
 
 
         // 调用运算机进行运算
         // 调用1000次进行性能测试
         long start = System.currentTimeMillis();
-        for(int i=0;i<1;i++) {
+        for (int i = 0; i < 1; i++) {
             caculator.process(e1);
 
             /*if(i % 10 == 0 ) {
@@ -168,14 +165,11 @@ public class Test_Rulemodel_01_calculatorTemplate {
             }*/
         }
         long end = System.currentTimeMillis();
-        System.out.println(end-start);  // 耗时约159ms
+        System.out.println(end - start);  // 耗时约159ms
 
 
         // 然后做匹配判断
         System.out.println(caculator.isMatch(1));
-
-
-
 
 
     }

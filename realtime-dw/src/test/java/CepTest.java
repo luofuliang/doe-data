@@ -17,15 +17,15 @@ public class CepTest {
                         "      adid   INT,                               " +
                         "      ts BIGINT,                               " +
                         "      eid STRING ,                          " +
-                        "      rt as to_timestamp_ltz(ts,3)  ,"+
-                        "      watermark for rt as rt "+
+                        "      rt as to_timestamp_ltz(ts,3)  ," +
+                        "      watermark for rt as rt " +
                         " ) WITH (                                                " +
                         "  'connector' = 'kafka',                          " +
                         "  'topic' = 'test-ad',                                " +
                         "  'properties.bootstrap.servers' = 'doitedu:9092',       " +
                         "  'properties.group.id' = 'testGroup',                   " +
-                        "  'scan.startup.mode' = 'latest-offset',                      "  +
-                        "  'format' = 'csv'                        "  +
+                        "  'scan.startup.mode' = 'latest-offset',                      " +
+                        "  'format' = 'csv'                        " +
                         " ) ");
 
         tableEnv.executeSql("select * from kafka_ad")/*.print()*/;

@@ -5,24 +5,22 @@ import java.sql.*;
 public class DynamicCallTest {
 
 
-    public static void main(String[] args) throws InterruptedException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public static void main(String[] args) throws InterruptedException, SQLException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException {
 
         System.out.println("我在工作中.....");
 
         System.out.println("我在工作中.....");
-
 
         System.out.println("我要调一个工具来做加法");
-
 
         Connection conn = DriverManager.getConnection("jdbc:mysql://doitedu:3306/rtmk", "root", "root");
         Statement stmt = conn.createStatement();
 
-
-        while(true) {
+        while (true) {
 
             ResultSet rs = stmt.executeQuery("select class_name,java_code from t_dynamic_code");
-            while(rs.next()) {
+            while (rs.next()) {
                 String class_name = rs.getString("class_name");
                 String java_code = rs.getString("java_code");
 
@@ -39,8 +37,5 @@ public class DynamicCallTest {
                 Thread.sleep(2000);
             }
         }
-
     }
-
-
 }

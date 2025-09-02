@@ -27,7 +27,7 @@ public class DorisConnectorTest {
             }
         });
 
-        tenv.createTemporaryView("tmp",stuDs);
+        tenv.createTemporaryView("tmp", stuDs);
 
         /*tenv.executeSql("select * from tmp").print();*/
 
@@ -49,11 +49,8 @@ public class DorisConnectorTest {
                         " )                                                "
         );
 
-
         // 从socket数据表中，select数据  ，insert到doris连接器表
         tenv.executeSql("insert into flink_doris_sink select id,age,name from tmp");
-
-
 
         env.execute();
 

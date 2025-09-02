@@ -33,7 +33,7 @@ object HiveTags2Es {
 
 
     import org.elasticsearch.spark._
-    tagsRdd.saveToEs("doeusers/",Map("es.mapping.id" -> "guid"))
+    tagsRdd.saveToEs("doeusers/", Map("es.mapping.id" -> "guid"))
 
 
     spark.close()

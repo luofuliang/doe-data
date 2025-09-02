@@ -4,11 +4,11 @@ import akka.actor.{Actor, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 
 
-class ServerActor extends Actor{
+class ServerActor extends Actor {
 
   override def receive: Receive = {
 
-    case Message(msg)=>
+    case Message(msg) =>
       println("服务端收到消息：" + msg)
       sender() ! Message("服务端来了")
     case _ =>

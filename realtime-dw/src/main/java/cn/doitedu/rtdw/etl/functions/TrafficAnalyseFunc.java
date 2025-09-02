@@ -29,7 +29,8 @@ public class TrafficAnalyseFunc extends KeyedProcessFunction<Tuple2<Long, String
 
 
         // 构造一个state，用于记录当前所在切割子会话的起始时间
-        ValueStateDescriptor<Long> splitSessionStartTimeStateDesc = new ValueStateDescriptor<>("splitSessionStartTime", Long.class);
+        ValueStateDescriptor<Long> splitSessionStartTimeStateDesc = new ValueStateDescriptor<>("splitSessionStartTime"
+                , Long.class);
         splitSessionStartTimeState = getRuntimeContext().getState(splitSessionStartTimeStateDesc);
 
 
@@ -41,13 +42,15 @@ public class TrafficAnalyseFunc extends KeyedProcessFunction<Tuple2<Long, String
     }
 
     @Override
-    public void processElement(EventBean eventBean, KeyedProcessFunction<Tuple2<Long, String>, EventBean, TrafficBean>.Context ctx, Collector<TrafficBean> out) throws Exception {
+    public void processElement(EventBean eventBean, KeyedProcessFunction<Tuple2<Long, String>, EventBean,
+            TrafficBean>.Context ctx, Collector<TrafficBean> out) throws Exception {
 
         // 判断是否新访客
         long firstRegisterTime = eventBean.getRegisterTime();
         long firstAccessTime = eventBean.getFirstAccessTime();
 
-        String firstAccessdate = DateFormatUtils.format(firstRegisterTime > 0 ? firstRegisterTime : firstAccessTime, "yyyy-MM-dd");
+        String firstAccessdate = DateFormatUtils.format(firstRegisterTime > 0 ? firstRegisterTime : firstAccessTime,
+                "yyyy-MM-dd");
         String now = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd");
         int isNew = firstAccessdate.compareTo(now) >= 0 ? 1 : 0;
 

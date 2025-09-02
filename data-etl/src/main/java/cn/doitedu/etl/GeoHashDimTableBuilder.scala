@@ -18,13 +18,13 @@ object GeoHashDimTableBuilder {
 
     // 加载mysql中的原始地理位置信息数据表
     val props = new Properties()
-    props.setProperty("user","root")
-    props.setProperty("password","root")
+    props.setProperty("user", "root")
+    props.setProperty("password", "root")
 
     val df = spark.read.jdbc("jdbc:mysql://doitedu:3306/realtimedw", "t_md_areas", props)
     df.createTempView("t")
 
-    spark.udf.register("geo",gps2GeoHashcode)
+    spark.udf.register("geo", gps2GeoHashcode)
 
     spark.sql(
       """

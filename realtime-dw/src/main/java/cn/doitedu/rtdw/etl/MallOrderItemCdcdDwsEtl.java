@@ -77,7 +77,8 @@ public class MallOrderItemCdcdDwsEtl {
                 "       p.brand                                                                         " +
                 "    from oms_order_item_cdc_source o                                                   " +
                 "    left join pms_product_cdc_source p                                                 " +
-                "    on o.pid=p.pid                                                                     " )*//*.print()*//*;*/
+                "    on o.pid=p.pid                                                                     " )*//*.print
+                ()*//*;*/
         //tEnv.executeSql("desc oms_order_item_cdc_source").print();
         // tEnv.executeSql("desc ov").print();
 
@@ -87,37 +88,37 @@ public class MallOrderItemCdcdDwsEtl {
          */
         tEnv.executeSql(
                 "CREATE TABLE kafka_oms_order_wide_sink (  " +
-                        "    oid  INT,                            "+
-                        "    pid  INT,                            "+
-                        "    price FLOAT,                         "+
-                        "    quantity  INT,                       "+
-                        "    create_time timestamp(3),            "+
-                        "    brand  STRING      ,                 "+
-                        "    PRIMARY KEY (oid,pid)  NOT ENFORCED  "+
-                ") WITH (                                         " +
-                "  'connector' = 'upsert-kafka',                  " +
-                "  'topic' = 'dws-oms-order-wide',                " +
-                "  'properties.bootstrap.servers' = 'doitedu:9092',     " +
-                "  'properties.group.id' = 'g_oms-order-wide',          " +
-                "  'key.format' = 'json'  ,                            " +
-                "  'value.format' = 'json'                              " +
-                ")");
+                        "    oid  INT,                            " +
+                        "    pid  INT,                            " +
+                        "    price FLOAT,                         " +
+                        "    quantity  INT,                       " +
+                        "    create_time timestamp(3),            " +
+                        "    brand  STRING      ,                 " +
+                        "    PRIMARY KEY (oid,pid)  NOT ENFORCED  " +
+                        ") WITH (                                         " +
+                        "  'connector' = 'upsert-kafka',                  " +
+                        "  'topic' = 'dws-oms-order-wide',                " +
+                        "  'properties.bootstrap.servers' = 'doitedu:9092',     " +
+                        "  'properties.group.id' = 'g_oms-order-wide',          " +
+                        "  'key.format' = 'json'  ,                            " +
+                        "  'value.format' = 'json'                              " +
+                        ")");
 
         /**
          * 对订单商品详情表 和  商品信息维度表  ，做JOIN打宽，并将结果插入到上面创建的kakfka中间表
          *
          */
         tEnv.executeSql(
-                " INSERT INTO kafka_oms_order_wide_sink             "+
-                        " select                             "+
-                        "    o.oid,                          "+
-                        "    o.pid,                          "+
-                        "    o.price,                        "+
-                        "    o.quantity,                     "+
-                        "    o.create_time,                  "+
-                        "    p.brand                         "+
-                        " from oms_order_item_cdc_source o   "+
-                        " left join pms_product_cdc_source p "+
+                " INSERT INTO kafka_oms_order_wide_sink             " +
+                        " select                             " +
+                        "    o.oid,                          " +
+                        "    o.pid,                          " +
+                        "    o.price,                        " +
+                        "    o.quantity,                     " +
+                        "    o.create_time,                  " +
+                        "    p.brand                         " +
+                        " from oms_order_item_cdc_source o   " +
+                        " left join pms_product_cdc_source p " +
                         " on o.pid=p.pid                     "
         );
 

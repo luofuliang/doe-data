@@ -35,22 +35,26 @@ import java.util.Map;
  * @Desc: 规则运算、匹配的核心计算函数
  **/
 @Slf4j
-public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject> {
+public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean,
+        JSONObject> {
 
     MapState<String, Long> timerState;
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        timerState = getRuntimeContext().getMapState(new MapStateDescriptor<String, Long>("timerState", String.class, Long.class));
+        timerState = getRuntimeContext().getMapState(new MapStateDescriptor<String, Long>("timerState", String.class,
+                Long.class));
     }
 
     /**
      * 处理用户事件流
      */
     @Override
-    public void processElement(UserEvent userEvent, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.ReadOnlyContext ctx, Collector<JSONObject> out) throws Exception {
+    public void processElement(UserEvent userEvent, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean,
+            JSONObject>.ReadOnlyContext ctx, Collector<JSONObject> out) throws Exception {
 
-        ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState =
+                ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
         Iterable<Map.Entry<String, RuleMetaBean>> ruleEntries = broadcastState.immutableEntries();
 
         // 遍历每一个规则，进行相应处理
@@ -79,15 +83,13 @@ public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Inte
                     ctx.output(new OutputTag<>("ruleStatInfo", TypeInformation.of(JSONObject.class)), resObject);
                 }
             }
-
-
         }
-
     }
 
 
     @Override
-    public void onTimer(long timestamp, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.OnTimerContext ctx, Collector<JSONObject> out) throws Exception {
+    public void onTimer(long timestamp,
+                        KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.OnTimerContext ctx, Collector<JSONObject> out) throws Exception {
 
         for (Map.Entry<String, Long> entry : timerState.entries()) {
             // ruleId + ":" + checkEventAttributeValue
@@ -95,25 +97,26 @@ public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Inte
             String ruleId = key.split(":")[0];
             Long registerTime = entry.getValue();
             if (registerTime != null && registerTime == timestamp) {
-                RuleCalculator ruleCalculator = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor).get(ruleId).getRuleCalculator();
+                RuleCalculator ruleCalculator =
+                        ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor).get(ruleId).getRuleCalculator();
                 if (ruleCalculator instanceof TimerRuleCalculator) {
 
                     TimerRuleCalculator timerRuleCalculator = (TimerRuleCalculator) ruleCalculator;
 
-                    List<JSONObject> resJsonObjects = timerRuleCalculator.onTimer(timestamp, ctx.getCurrentKey(),timerState, ctx.timerService());
+                    List<JSONObject> resJsonObjects = timerRuleCalculator.onTimer(timestamp, ctx.getCurrentKey(),
+                            timerState, ctx.timerService());
                     for (JSONObject resObject : resJsonObjects) {
                         if ("match".equals(resObject.getString("resType"))) {
                             log.info("-----flink---中----输出了");
                             out.collect(resObject);
                         } else {
-                            ctx.output(new OutputTag<>("ruleStatInfo", TypeInformation.of(JSONObject.class)), resObject);
+                            ctx.output(new OutputTag<>("ruleStatInfo", TypeInformation.of(JSONObject.class)),
+                                    resObject);
                         }
                     }
-
                 }
             }
         }
-
     }
 
     /**
@@ -121,9 +124,11 @@ public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Inte
      * 也就是规则引擎的规则注入模块
      */
     @Override
-    public void processBroadcastElement(RuleMetaBean ruleMetaBean, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
+    public void processBroadcastElement(RuleMetaBean ruleMetaBean, KeyedBroadcastProcessFunction<Integer, UserEvent,
+            RuleMetaBean, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
 
-        BroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        BroadcastState<String, RuleMetaBean> broadcastState =
+                ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
 
         // 根据收到的规则管理的操作类型，去操作广播状态
         try {
@@ -135,7 +140,8 @@ public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Inte
                 RuleCalculator ruleCalculator = (RuleCalculator) aClass.newInstance();
 
                 // 对规则运算器做初始化
-                ruleCalculator.init(JSON.parseObject(ruleMetaBean.getRuleParamJson()), ruleMetaBean.getProfileUserBitmap());
+                ruleCalculator.init(JSON.parseObject(ruleMetaBean.getRuleParamJson()),
+                        ruleMetaBean.getProfileUserBitmap());
 
                 /*if (ruleCalculator instanceof TimerRuleCalculator) {
                     TimerRuleCalculator timerRuleCalculator = (TimerRuleCalculator) ruleCalculator;
@@ -147,7 +153,8 @@ public class RuleMatchProcessFunction extends KeyedBroadcastProcessFunction<Inte
 
                 // 再把ruleMetaBean，放入广播状态
                 broadcastState.put(ruleMetaBean.getRuleId(), ruleMetaBean);
-                log.debug("收到规则管理信息，操作类型:{}, 规则模型:{},规则id:{} ,创建人:{}", ruleMetaBean.getOperateType(), ruleMetaBean.getRuleModelId(), ruleMetaBean.getRuleId(), ruleMetaBean.getCreatorName());
+                log.debug("收到规则管理信息，操作类型:{}, 规则模型:{},规则id:{} ,创建人:{}", ruleMetaBean.getOperateType(),
+                        ruleMetaBean.getRuleModelId(), ruleMetaBean.getRuleId(), ruleMetaBean.getCreatorName());
             } else {
                 // 从广播状态中，删除掉该规则的ruleMetaBean
                 broadcastState.remove(ruleMetaBean.getRuleId());

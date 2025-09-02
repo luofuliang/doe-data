@@ -46,21 +46,18 @@ public class FlinkCdcTest {
 
         // 实时报表统计：  查询每种性别中，成绩最高的前2个同学
         tableEnv.executeSql(
-                " select                                                              "+
-                        "   id,name,gender,score                                               "+
-                        " from                                                                 "+
-                        " (                                                                    "+
-                        " select                                                               "+
-                        "    id,                                                               "+
-                        "    name,                                                             "+
-                        "    gender,                                                           "+
-                        "    score,                                                            "+
-                        "    row_number() over(partition by gender order by score desc) as rn  "+
-                        " from flink_score ) o                                                 "+
+                " select                                                              " +
+                        "   id,name,gender,score                                               " +
+                        " from                                                                 " +
+                        " (                                                                    " +
+                        " select                                                               " +
+                        "    id,                                                               " +
+                        "    name,                                                             " +
+                        "    gender,                                                           " +
+                        "    score,                                                            " +
+                        "    row_number() over(partition by gender order by score desc) as rn  " +
+                        " from flink_score ) o                                                 " +
                         " where rn<=2                                                          "
         ).print();
-
-
     }
-
 }

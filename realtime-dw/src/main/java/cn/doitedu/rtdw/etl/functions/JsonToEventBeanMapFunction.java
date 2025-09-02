@@ -11,9 +11,9 @@ public class JsonToEventBeanMapFunction implements MapFunction<String, EventBean
 
         EventBean eventBean = null;
 
-        try{
-            eventBean = JSON.parseObject(jsonLine,EventBean.class);
-        }catch (Exception e){
+        try {
+            eventBean = JSON.parseObject(jsonLine, EventBean.class);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

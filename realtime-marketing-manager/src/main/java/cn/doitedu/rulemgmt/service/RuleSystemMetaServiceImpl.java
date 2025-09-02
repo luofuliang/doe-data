@@ -16,12 +16,13 @@ public class RuleSystemMetaServiceImpl implements RuleSystemMetaService {
     RuleSystemMetaDao ruleSystemMetaDao;
 
     @Autowired
-    public RuleSystemMetaServiceImpl(RuleSystemMetaDao ruleSystemMetaDao){
+    public RuleSystemMetaServiceImpl(RuleSystemMetaDao ruleSystemMetaDao) {
         this.ruleSystemMetaDao = ruleSystemMetaDao;
     }
 
     /**
      * 根据规则模型的id，查询规则模型的运算代码模板
+     *
      * @param ruleModelId
      * @return
      * @throws SQLException
@@ -50,7 +51,7 @@ public class RuleSystemMetaServiceImpl implements RuleSystemMetaService {
     ) throws IOException, SQLException {
 
         byte[] bitmapBytes = null;
-        if(profileUserBitmap !=null ){
+        if (profileUserBitmap != null) {
             ByteArrayOutputStream bao = new ByteArrayOutputStream();
             DataOutputStream dao = new DataOutputStream(bao);
             profileUserBitmap.serialize(dao);
@@ -59,11 +60,9 @@ public class RuleSystemMetaServiceImpl implements RuleSystemMetaService {
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-
-        ruleSystemMetaDao.insertRuleInfo(rule_id,rule_model_id,creator_name,rule_status,timestamp,timestamp,bitmapBytes,
-                ruleDefineParamsJson,ruleModelCaculatorGroovyCode);
+        ruleSystemMetaDao.insertRuleInfo(rule_id, rule_model_id, creator_name, rule_status, timestamp, timestamp,
+                bitmapBytes,
+                ruleDefineParamsJson, ruleModelCaculatorGroovyCode);
 
     }
-
-
 }

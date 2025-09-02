@@ -30,7 +30,8 @@ import java.util.Map;
  * @Desc: 规则运算、匹配的核心计算函数
  **/
 @Slf4j
-public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject> {
+public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean,
+        JSONObject> {
     private Jedis jedis;
 
     MapState<Long, List<String>> timerState;
@@ -45,9 +46,11 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
      * 处理用户事件流
      */
     @Override
-    public void processElement(UserEvent userEvent, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.ReadOnlyContext ctx, Collector<JSONObject> out) throws Exception {
+    public void processElement(UserEvent userEvent, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean,
+            JSONObject>.ReadOnlyContext ctx, Collector<JSONObject> out) throws Exception {
 
-        ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState =
+                ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
         Iterable<Map.Entry<String, RuleMetaBean>> ruleEntries = broadcastState.immutableEntries();
 
         // 遍历每一个规则，进行相应处理
@@ -74,10 +77,12 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
                     // 如果是触发事件，则判断本行为人是否已经满足了本规则的所有条件
                     boolean isMatch = ruleMetaBean.getRuleCalculator().isMatch(userEvent.getGuid());
 
-                    log.info("用户:{} ,触发事件:{},规则:{},规则匹配结果:{}",userEvent.getGuid(),userEvent.getEventId(),ruleEntry.getKey(),isMatch);
+                    log.info("用户:{} ,触发事件:{},规则:{},规则匹配结果:{}", userEvent.getGuid(), userEvent.getEventId(),
+                            ruleEntry.getKey(), isMatch);
                     // 如果已满足，则输出本规则的触达信息
-                    if(isMatch) {
-                        RuleMatchResult res = new RuleMatchResult(userEvent.getGuid(), ruleEntry.getKey(), System.currentTimeMillis());
+                    if (isMatch) {
+                        RuleMatchResult res = new RuleMatchResult(userEvent.getGuid(), ruleEntry.getKey(),
+                                System.currentTimeMillis());
                         out.collect(JSON.parseObject(JSON.toJSONString(res)));
                     }
 
@@ -86,7 +91,8 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
                 else {
                     // 做规则运算
                     ruleMetaBean.getRuleCalculator().calc(userEvent);
-                    log.info("收到用户:{} ,行为事件:{}, 规则条件运算：{}", userEvent.getGuid(), userEvent.getEventId(), ruleEntry.getKey());
+                    log.info("收到用户:{} ,行为事件:{}, 规则条件运算：{}", userEvent.getGuid(), userEvent.getEventId(),
+                            ruleEntry.getKey());
                 }
             }
         }
@@ -109,11 +115,12 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
     }
 
 
-
     @Override
-    public void onTimer(long timestamp, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.OnTimerContext ctx, Collector<JSONObject> out) throws Exception {
+    public void onTimer(long timestamp,
+                        KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.OnTimerContext ctx, Collector<JSONObject> out) throws Exception {
 
-        /*ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        /*ReadOnlyBroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors
+        .ruleMetaBeanMapStateDescriptor);
 
         List<String> rules = timerState.get(timestamp);
         for (String ruleId : rules) {
@@ -131,9 +138,11 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
      * 也就是规则引擎的规则注入模块
      */
     @Override
-    public void processBroadcastElement(RuleMetaBean ruleMetaBean, KeyedBroadcastProcessFunction<Integer, UserEvent, RuleMetaBean, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
+    public void processBroadcastElement(RuleMetaBean ruleMetaBean, KeyedBroadcastProcessFunction<Integer, UserEvent,
+            RuleMetaBean, JSONObject>.Context ctx, Collector<JSONObject> out) throws Exception {
 
-        BroadcastState<String, RuleMetaBean> broadcastState = ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
+        BroadcastState<String, RuleMetaBean> broadcastState =
+                ctx.getBroadcastState(FlinkStateDescriptors.ruleMetaBeanMapStateDescriptor);
 
         // 根据收到的规则管理的操作类型，去操作广播状态
         try {
@@ -144,14 +153,16 @@ public class RuleMatchProcessFunctionOld extends KeyedBroadcastProcessFunction<I
                 RuleCalculator ruleConditionCalculator = (RuleCalculator) aClass.newInstance();
 
                 // 对规则运算器做初始化
-                ruleConditionCalculator.init( JSON.parseObject(ruleMetaBean.getRuleParamJson()),ruleMetaBean.getProfileUserBitmap());
+                ruleConditionCalculator.init(JSON.parseObject(ruleMetaBean.getRuleParamJson()),
+                        ruleMetaBean.getProfileUserBitmap());
 
                 // 然后将创建好的运算机对象，填充到ruleMetaBean
                 ruleMetaBean.setRuleCalculator(ruleConditionCalculator);
 
                 // 再把ruleMetaBean，放入广播状态
                 broadcastState.put(ruleMetaBean.getRuleId(), ruleMetaBean);
-                log.info("接收到一个规则管理信息，操作类型是:{}, 所属的规则模型是:{} ,创建人是:{}", ruleMetaBean.getOperateType(), ruleMetaBean.getRuleModelId(), ruleMetaBean.getCreatorName());
+                log.info("接收到一个规则管理信息，操作类型是:{}, 所属的规则模型是:{} ,创建人是:{}", ruleMetaBean.getOperateType(),
+                        ruleMetaBean.getRuleModelId(), ruleMetaBean.getCreatorName());
             } else {
                 // 从广播状态中，删除掉该规则的ruleMetaBean
                 broadcastState.remove(ruleMetaBean.getRuleId());

@@ -23,13 +23,10 @@ public class Utils {
                 return new Event(Integer.parseInt(split[0]), split[1]);
             }
         });
-
         return eventDs;
     }
 
-
-
-    public static DataStream<RoaringBitmap> getKafkaBitmap( StreamExecutionEnvironment env){
+    public static DataStream<RoaringBitmap> getKafkaBitmap(StreamExecutionEnvironment env) {
 
         // 构造一个 kafka 的source
         KafkaSource<RoaringBitmap> kafkaSource = KafkaSource.<RoaringBitmap>builder()
@@ -41,7 +38,7 @@ public class Utils {
                 .build();
 
         // 人群画像bitmap topic获取数据
-        DataStreamSource<RoaringBitmap> ds = env.fromSource(kafkaSource,WatermarkStrategy.noWatermarks(),"bm");
+        DataStreamSource<RoaringBitmap> ds = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "bm");
 
         return ds;
     }
@@ -57,7 +54,7 @@ public class Utils {
                 .build();
 
         // 人群画像bitmap topic获取数据
-        DataStreamSource<String> ds = env.fromSource(kafkaSource,WatermarkStrategy.noWatermarks(),"bmbase64");
+        DataStreamSource<String> ds = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "bmbase64");
 
         return ds;
     }

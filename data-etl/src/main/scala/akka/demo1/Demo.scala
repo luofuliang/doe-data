@@ -47,7 +47,7 @@ object Demo {
     val helloActorRef = actorSystem.actorOf(Props(classOf[HelloActor]), "haha")
     val heiheiActorRef = actorSystem.actorOf(Props(classOf[HeiheiActor]), "heihei")
 
-    helloActorRef.tell("haha",heiheiActorRef)
+    helloActorRef.tell("haha", heiheiActorRef)
 
 
   }

@@ -50,7 +50,8 @@ public class GaodeGpsUtil {
                     // 取到一个gps经纬度座标
                     String[] gps = line.split(",");
                     System.out.println("拿到一个gps座标： " + line);
-                    String geohash = GeoHash.geoHashStringWithCharacterPrecision(Double.parseDouble(gps[0]), Double.parseDouble(gps[1]), 5);
+                    String geohash = GeoHash.geoHashStringWithCharacterPrecision(Double.parseDouble(gps[0]),
+                            Double.parseDouble(gps[1]), 5);
                     HttpGet get = new HttpGet(requestUrl + gps[1] + "," + gps[0]);
 
                     // 发出请求

@@ -25,7 +25,7 @@ public class AdShowClickPatternRecognize {
 
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
         Configuration conf = new Configuration();
-        conf.setInteger("table.exec.resource.default-parallelism",1);
+        conf.setInteger("table.exec.resource.default-parallelism", 1);
         tEnv.getConfig().addConfiguration(conf);
 
 
@@ -35,13 +35,13 @@ public class AdShowClickPatternRecognize {
          */
         tEnv.executeSql(
                 "CREATE TABLE kafka_ad_event_source (        " +
-                        "    guid   BIGINT,                           "+
-                        "    ad_id  STRING,                           "+
-                        "    event_id STRING,                         "+
-                        "    event_time  BIGINT,                      "+
-                        "    tracking_id STRING,                      "+
-                        "    rt AS to_timestamp_ltz(event_time,3),    "+
-                        "    WATERMARK FOR  rt  AS    rt - INTERVAL '0' SECOND   "+
+                        "    guid   BIGINT,                           " +
+                        "    ad_id  STRING,                           " +
+                        "    event_id STRING,                         " +
+                        "    event_time  BIGINT,                      " +
+                        "    tracking_id STRING,                      " +
+                        "    rt AS to_timestamp_ltz(event_time,3),    " +
+                        "    WATERMARK FOR  rt  AS    rt - INTERVAL '0' SECOND   " +
                         ") WITH (                                        " +
                         "  'connector' = 'kafka',                        " +
                         "  'topic' = 'dwd-ad-events',                    " +
@@ -56,28 +56,28 @@ public class AdShowClickPatternRecognize {
 
 
         tEnv.executeSql(
-                " SELECT                                                                   "+
-                        "    guid,                                                                 "+
-                        "    ad_id,                                                                "+
-                        "    show_time,                                                            "+
-                        "    click_time                                                            "+
-                        " FROM kafka_ad_event_source                                               "+
-                        "   MATCH_RECOGNIZE(                                                       "+
-                        "   PARTITION BY guid                                                      "+
-                        "   ORDER BY rt                                                            "+
-                        "   MEASURES                                                               "+
-                        "     A.guid AS a_guid,                                                      "+
-                        "     A.ad_id AS ad_id,                                                    "+
-                        "     A.event_time AS show_time,                                           "+
-                        "     B.event_time as click_time                                           "+
-                        "   ONE ROW PER MATCH                                                      "+
-                        "   AFTER MATCH SKIP TO NEXT ROW                                           "+
-                        "   PATTERN(A C* B)                                                        "+
-                        "   DEFINE                                                                 "+
-                        "      A  AS   A.event_id = 'adShow'  ,                                    "+
-                        "      B  AS   B.event_id = 'adClick' AND  B.tracking_id = A.tracking_id , "+
-                        "      C  AS   NOT C.tracking_id = A.tracking_id                           "+
-                        "                                                                          "+
+                " SELECT                                                                   " +
+                        "    guid,                                                                 " +
+                        "    ad_id,                                                                " +
+                        "    show_time,                                                            " +
+                        "    click_time                                                            " +
+                        " FROM kafka_ad_event_source                                               " +
+                        "   MATCH_RECOGNIZE(                                                       " +
+                        "   PARTITION BY guid                                                      " +
+                        "   ORDER BY rt                                                            " +
+                        "   MEASURES                                                               " +
+                        "     A.guid AS a_guid,                                                      " +
+                        "     A.ad_id AS ad_id,                                                    " +
+                        "     A.event_time AS show_time,                                           " +
+                        "     B.event_time as click_time                                           " +
+                        "   ONE ROW PER MATCH                                                      " +
+                        "   AFTER MATCH SKIP TO NEXT ROW                                           " +
+                        "   PATTERN(A C* B)                                                        " +
+                        "   DEFINE                                                                 " +
+                        "      A  AS   A.event_id = 'adShow'  ,                                    " +
+                        "      B  AS   B.event_id = 'adClick' AND  B.tracking_id = A.tracking_id , " +
+                        "      C  AS   NOT C.tracking_id = A.tracking_id                           " +
+                        "                                                                          " +
                         "   ) AS t                                                                 "
         ).print();
 
